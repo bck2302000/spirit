@@ -1,6 +1,6 @@
 #pragma once
-#ifndef VECTORMATH_H
-#define VECTORMATH_H
+#ifndef SPIRIT_CORE_ENGINE_VECTORMATH_HPP
+#define SPIRIT_CORE_ENGINE_VECTORMATH_HPP
 
 #include <memory>
 #include <vector>

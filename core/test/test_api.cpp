@@ -4,9 +4,10 @@
 #include <Spirit/Simulation.h>
 #include <Spirit/State.h>
 #include <Spirit/System.h>
-#include <catch.hpp>
 #include <data/State.hpp>
 #include <utility/Exception.hpp>
+
+#include <catch.hpp>
 
 auto inputfile = "core/test/input/api.cfg";
 

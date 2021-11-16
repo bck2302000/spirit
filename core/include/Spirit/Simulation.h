@@ -1,14 +1,15 @@
 #pragma once
-#ifndef INTERFACE_SIMULATION_H
-#define INTERFACE_SIMULATION_H
+#ifndef SPIRIT_CORE_SIMULATION_H
+#define SPIRIT_CORE_SIMULATION_H
 #include "DLL_Define_Export.h"
-struct State;
 
 #include <vector>
 
+struct State;
+
 /*
 Simulation
-====================================================================
+
 
 ```C
 #include "Spirit/Simulation.h"

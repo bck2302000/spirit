@@ -1,12 +1,13 @@
 #pragma once
-#ifndef INTERFACE_CONFIGURATIONS_H
-#define INTERFACE_CONFIGURATIONS_H
+#ifndef SPIRIT_CORE_CONFIGURATIONS_H
+#define SPIRIT_CORE_CONFIGURATIONS_H
 #include "DLL_Define_Export.h"
+
 struct State;
 
 /*
 Configurations
-====================================================================
+
 
 ```C
 #include "Spirit/Configurations.h"

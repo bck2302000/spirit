@@ -12,7 +12,8 @@
 #include <Eigen/Dense>
 
 std::function<bool( const Vector3 &, const Vector3 & )> get_filter(
-    Vector3 position, const float r_cut_rectangular[3], float r_cut_cylindrical, float r_cut_spherical, bool inverted )
+    const Vector3 & position, const float r_cut_rectangular[3], float r_cut_cylindrical, float r_cut_spherical,
+    bool inverted )
 {
     bool no_cut_rectangular_x = r_cut_rectangular[0] < 0;
     bool no_cut_rectangular_y = r_cut_rectangular[1] < 0;
@@ -25,36 +26,35 @@ std::function<bool( const Vector3 &, const Vector3 & )> get_filter(
     {
         filter = [position, r_cut_rectangular, r_cut_cylindrical, r_cut_spherical, no_cut_rectangular_x,
                   no_cut_rectangular_y, no_cut_rectangular_z, no_cut_cylindrical,
-                  no_cut_spherical]( const Vector3 & spin, const Vector3 & positions ) {
+                  no_cut_spherical]( const Vector3 &, const Vector3 & positions )
+        {
             Vector3 r_rectangular = positions - position;
             scalar r_cylindrical
                 = std::sqrt( std::pow( positions[0] - position[0], 2 ) + std::pow( positions[1] - position[1], 2 ) );
             scalar r_spherical = ( positions - position ).norm();
-            if( ( no_cut_rectangular_x || std::abs( r_rectangular[0] ) < r_cut_rectangular[0] )
-                && ( no_cut_rectangular_y || std::abs( r_rectangular[1] ) < r_cut_rectangular[1] )
-                && ( no_cut_rectangular_z || std::abs( r_rectangular[2] ) < r_cut_rectangular[2] )
-                && ( no_cut_cylindrical || r_cylindrical < r_cut_cylindrical )
-                && ( no_cut_spherical || r_spherical < r_cut_spherical ) )
-                return true;
-            return false;
+            return ( no_cut_rectangular_x || std::abs( r_rectangular[0] ) < r_cut_rectangular[0] )
+                   && ( no_cut_rectangular_y || std::abs( r_rectangular[1] ) < r_cut_rectangular[1] )
+                   && ( no_cut_rectangular_z || std::abs( r_rectangular[2] ) < r_cut_rectangular[2] )
+                   && ( no_cut_cylindrical || r_cylindrical < r_cut_cylindrical )
+                   && ( no_cut_spherical || r_spherical < r_cut_spherical );
         };
     }
     else
     {
         filter = [position, r_cut_rectangular, r_cut_cylindrical, r_cut_spherical, no_cut_rectangular_x,
                   no_cut_rectangular_y, no_cut_rectangular_z, no_cut_cylindrical,
-                  no_cut_spherical]( const Vector3 & spin, const Vector3 & positions ) {
+                  no_cut_spherical]( const Vector3 & spin, const Vector3 & positions )
+        {
             Vector3 r_rectangular = positions - position;
             scalar r_cylindrical
                 = std::sqrt( std::pow( positions[0] - position[0], 2 ) + std::pow( positions[1] - position[1], 2 ) );
             scalar r_spherical = ( positions - position ).norm();
-            if( !( ( no_cut_rectangular_x || std::abs( r_rectangular[0] ) < r_cut_rectangular[0] )
-                   && ( no_cut_rectangular_y || std::abs( r_rectangular[1] ) < r_cut_rectangular[1] )
-                   && ( no_cut_rectangular_z || std::abs( r_rectangular[2] ) < r_cut_rectangular[2] )
-                   && ( no_cut_cylindrical || r_cylindrical < r_cut_cylindrical )
-                   && ( no_cut_spherical || r_spherical < r_cut_spherical ) ) )
-                return true;
-            return false;
+            return !(
+                ( no_cut_rectangular_x || std::abs( r_rectangular[0] ) < r_cut_rectangular[0] )
+                && ( no_cut_rectangular_y || std::abs( r_rectangular[1] ) < r_cut_rectangular[1] )
+                && ( no_cut_rectangular_z || std::abs( r_rectangular[2] ) < r_cut_rectangular[2] )
+                && ( no_cut_cylindrical || r_cylindrical < r_cut_cylindrical )
+                && ( no_cut_spherical || r_spherical < r_cut_spherical ) );
         };
     }
 
@@ -73,7 +73,7 @@ std::string filter_to_string(
     if( r_cut_rectangular[0] <= 0 && r_cut_rectangular[1] <= 0 && r_cut_rectangular[2] <= 0 && r_cut_cylindrical <= 0
         && r_cut_spherical <= 0 && !inverted )
     {
-        if( ret != "" )
+        if( !ret.empty() )
             ret += " ";
         ret += "Entire space.";
     }
@@ -81,26 +81,26 @@ std::string filter_to_string(
     {
         if( r_cut_rectangular[0] > 0 || r_cut_rectangular[1] > 0 || r_cut_rectangular[2] > 0 )
         {
-            if( ret != "" )
+            if( !ret.empty() )
                 ret += " ";
             ret += fmt::format(
                 "Rectangular region: ({}, {}, {}).", r_cut_rectangular[0], r_cut_rectangular[1], r_cut_rectangular[2] );
         }
         if( r_cut_cylindrical > 0 )
         {
-            if( ret != "" )
+            if( !ret.empty() )
                 ret += " ";
             ret += fmt::format( "Cylindrical region, r={}.", r_cut_cylindrical );
         }
         if( r_cut_spherical > 0 )
         {
-            if( ret != "" )
+            if( !ret.empty() )
                 ret += " ";
             ret += fmt::format( "Spherical region, r={}.", r_cut_spherical );
         }
         if( inverted )
         {
-            if( ret != "" )
+            if( !ret.empty() )
                 ret += " ";
             ret += "Inverted.";
         }
@@ -165,7 +165,7 @@ bool Configuration_From_Clipboard_Shift(
 try
 {
     // Apply configuration
-    if( state->clipboard_spins.get() )
+    if( state->clipboard_spins )
     {
         std::shared_ptr<Data::Spin_System> image;
         std::shared_ptr<Data::Spin_System_Chain> chain;
@@ -427,7 +427,7 @@ try
              idx_image, idx_chain );
 
     // The eigenmode was potentially not calculated, yet
-    if( image->modes[idx_mode] == NULL )
+    if( image->modes[idx_mode] == nullptr )
         Log( Utility::Log_Level::Warning, Utility::Log_Sender::EMA,
              fmt::format(
                  "Eigenmode number {} has not "
